@@ -28,7 +28,7 @@ const ScratchWin = () => {
     "Better luck next time": "🍀"
   };
 
-  const scriptURL = "https://script.google.com/macros/s/AKfycbzip0Qd_VP6ESI9RHpjx5sf4bITTij1RVPPOC17ygF_dJKaihnh-Q-gtT2GnCeU44IB/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbyfMLPNZVAsn2uO8fFjSyhLLlm75SpmYkjEqx49akSiyU-yNEi5v6pJweFuJzmr3p4/exec";
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
