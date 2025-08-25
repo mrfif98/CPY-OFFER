@@ -19,14 +19,17 @@ const ScratchWin = () => {
   const [showScratch, setShowScratch] = useState(false);
   const [gift, setGift] = useState('');
 
-  const giftImages = {
-    "Payasam mix": "🥣",
-    "Lunch box": "🥡",
-    "Snack box": "🍿",
-    "Tiffin box": "🍱",
-    "Jug": "🫖",
-    "Better luck next time": "🍀"
-  };
+const giftImages = {
+  "Payasam mix": "🥣",            // bowl with spoon
+  "Lunch box": "🥡",             // takeout box
+  "Snacks box": "🍿",            // popcorn (snacks)
+  "Tiffin box": "🍱",            // bento box (if reused)
+  "Jug": "🫖",                   // teapot
+  "Coffee mug": "☕",            // coffee mug
+  "Casserole": "🍲",             // pot of food
+  "You Have a Compliment": "👏", // applause / compliment
+  "Better luck next time": "🍀"  // four-leaf clover
+};
 
   const scriptURL = "https://script.google.com/macros/s/AKfycbyfMLPNZVAsn2uO8fFjSyhLLlm75SpmYkjEqx49akSiyU-yNEi5v6pJweFuJzmr3p4/exec";
 
