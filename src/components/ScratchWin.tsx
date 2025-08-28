@@ -14,30 +14,29 @@ interface FormData {
 const ScratchWin = () => {
   const [formData, setFormData] = useState<FormData>({ phone: '', name: '' });
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false); // ✅ permanently disable state
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error' | 'warning' | 'better-luck'>('error');
   const [showScratch, setShowScratch] = useState(false);
   const [gift, setGift] = useState('');
 
-const giftImages = {
-  "Payasam mix": "🥣",            // bowl with spoon
-  "Lunch box": "🥡",             // takeout box
-  "Snacks box": "🍿",            // popcorn (snacks)
-  "Tiffin box": "🍱",            // bento box (if reused)
-  "Jug": "🫖",                   // teapot
-  "Coffee mug": "☕",            // coffee mug
-  "Casserole": "🍲",             // pot of food
-  "You Have a Compliment": "👏", // applause / compliment
-  "Better luck next time": "🍀"  // four-leaf clover
-};
+  const giftImages = {
+    "Payasam mix": "🥣",
+    "Lunch box": "🥡",
+    "Snacks box": "🍿",
+    "Tiffin box": "🍱",
+    "Jug": "🫖",
+    "Coffee mug": "☕",
+    "Casserole": "🍲",
+    "You Have a Compliment": "👏",
+    "Better luck next time": "🍀"
+  };
 
   const scriptURL = "https://script.google.com/macros/s/AKfycbyfMLPNZVAsn2uO8fFjSyhLLlm75SpmYkjEqx49akSiyU-yNEi5v6pJweFuJzmr3p4/exec";
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (message) {
-      setMessage('');
-    }
+    if (message) setMessage('');
   };
 
   const validateForm = (): boolean => {
@@ -46,26 +45,21 @@ const giftImages = {
       setMessageType('error');
       return false;
     }
-
     if (!formData.name.trim()) {
       setMessage('Please enter your name');
       setMessageType('error');
       return false;
     }
-
-    // Basic phone number validation (adjust regex as needed)
     const phoneRegex = /^[0-9]{10,15}$/;
     if (!phoneRegex.test(formData.phone.replace(/\s+/g, ''))) {
       setMessage('Please enter a valid phone number');
       setMessageType('error');
       return false;
     }
-
     return true;
   };
 
   const submitForm = async () => {
-    console.log('Form submission started');
     if (!validateForm()) return;
 
     setIsLoading(true);
@@ -74,7 +68,6 @@ const giftImages = {
     setGift('');
 
     try {
-      console.log('Sending request to server...');
       const response = await fetch(scriptURL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -82,44 +75,40 @@ const giftImages = {
       });
 
       const gift = await response.text();
-      console.log('Server response:', gift);
+      const trimmedGift = gift.trim();
 
-      if (gift === "invalid") {
-        console.log('Invalid submission detected');
+      if (trimmedGift === "invalid") {
         setMessage("❌ Invalid submission. Please check your details and try again.");
         setMessageType('error');
         setShowScratch(false);
-      } else if (gift === "error") {
-        console.log('Server error detected');
+      } else if (trimmedGift === "error") {
         setMessage("❌ Server error. Please try again later.");
         setMessageType('error');
         setShowScratch(false);
-      } else if (gift === "Better luck next time") {
-        console.log('Better luck next time case');
+      } else if (trimmedGift === "Better luck next time") {
         setMessage("😔 Oh no — better luck next time! Scratch to see.");
         setMessageType('better-luck');
-        setGift(gift);
+        setGift(trimmedGift);
         setShowScratch(true);
+        setIsSubmitted(true); // ✅ lock button after valid submission
       } else {
-        console.log('Success! Gift received:', gift);
         setMessage("🎉 Success! Scratch the card below to reveal your gift!");
         setMessageType('success');
-        setGift(gift);
+        setGift(trimmedGift);
         setShowScratch(true);
+        setIsSubmitted(true); // ✅ lock button after valid submission
       }
     } catch (error) {
-      console.error("Error:", error);
       setMessage("❌ Something went wrong. Please check your connection and try again.");
       setMessageType('error');
       setShowScratch(false);
     } finally {
       setIsLoading(false);
-      console.log('Form submission completed');
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !isLoading) {
+    if (e.key === 'Enter' && !isLoading && !isSubmitted) {
       submitForm();
     }
   };
@@ -147,7 +136,7 @@ const giftImages = {
                   onChange={(e) => handleInputChange('phone', e.target.value)}
                   onKeyPress={handleKeyPress}
                   className="pl-10"
-                  disabled={isLoading}
+                  disabled={isLoading || isSubmitted}
                 />
               </div>
               
@@ -160,14 +149,14 @@ const giftImages = {
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   onKeyPress={handleKeyPress}
                   className="pl-10"
-                  disabled={isLoading}
+                  disabled={isLoading || isSubmitted}
                 />
               </div>
             </div>
 
             <Button 
               onClick={submitForm} 
-              disabled={isLoading}
+              disabled={isLoading || isSubmitted} // ✅ permanently disable after submission
               className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
             >
               {isLoading ? (
@@ -175,8 +164,10 @@ const giftImages = {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Submitting...
                 </>
+              ) : isSubmitted ? (
+                "Submitted ✅"
               ) : (
-                'Submit'
+                "Submit"
               )}
             </Button>
 
